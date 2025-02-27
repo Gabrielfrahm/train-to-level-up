@@ -1,0 +1,40 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3333:3333"
+    container_name: train-to-level-up
+    volumes:
+      - .:/usr/src/app
+    command: yarn start:dev
+    networks:
+      - train-to-level-up
+    environment:
+      - NODE_ENV=development
+
+  traintolevelup:
+    image: postgres:latest
+    networks:
+      - train-to-level-up
+    container_name: train-to-level-up-db-container
+    volumes:
+      - train-to-level-up-db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: train-to-level-up-db
+      POSTGRES_PASSWORD: train-to-level-up-db
+      POSTGRES_DB: train-to-level-up-db
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U train-to-level-up-db' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  train-to-level-up:
+    driver: bridge
+
+volumes:
+  train-to-level-up-db-data:
