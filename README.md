@@ -6,7 +6,7 @@
 
 ![fluxo](/train%20to%20level%20up.jpeg)
 
-## Cadastro flow
+## Cadastro
 
 ```mermaid
 sequenceDiagram
@@ -16,9 +16,12 @@ sequenceDiagram
 
     Cliente->>Cognito:  Informações de cadastro
     Cognito->>SES: Envia codigo de confirmação de E-mail
+    SES-->>Cliente: Envia para o cliente a confirmação de E-mail
+    Cliente->>Cliente: Realiza a confirmação de e-mail.
+    note left of Cliente: Apos realiza confirmação de e-mail <br/> o Cliente podera fazer o login.
 ```
 
-## Login flow
+## Login
 
 ```mermaid
 sequenceDiagram
@@ -33,3 +36,5 @@ sequenceDiagram
     Cliente->>Cognito:  Insere código recebido
     Cognito-->>API:  Retorna token JWT
 ```
+
+##
