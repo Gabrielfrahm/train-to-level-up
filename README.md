@@ -11,10 +11,12 @@
 ```mermaid
 sequenceDiagram
     participant Cliente
+    participant Fargate as ESC Fargate
     participant Cognito as Amazon Cognito
     participant SES as Amazon simple email service (SES)
 
-    Cliente->>Cognito:  Informações de cadastro
+    Cliente->>Fargate:  Informações de cadastro
+    Fargate->>Cognito: Recebe as informações do Cadastro
     Cognito->>SES: Envia codigo de confirmação de E-mail
     SES-->>Cliente: Envia para o cliente a confirmação de E-mail
     Cliente->>Cliente: Realiza a confirmação de e-mail.
