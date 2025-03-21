@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HealthCheckController } from './health-check.controller';
 import { LoggingModule } from '@modules/logger/logger.module';
-import { ConfigModule } from '@config/config.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
