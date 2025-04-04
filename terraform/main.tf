@@ -21,8 +21,8 @@ module "new-vpc" {
   vpc_cidr_block = var.vpc_cidr_block
 }
 
-module "ec2" {
-  source            = "./modules/ec2"
+module "ecs" {
+  source            = "./modules/ecs"
   prefix            = var.prefix
   security_group_id = module.new-vpc.security_group_id
   subnet_ids        = module.new-vpc.subnet_ids
@@ -30,4 +30,7 @@ module "ec2" {
   max_size          = var.max_size
   min_size          = var.min_size
   vpc_id            = module.new-vpc.vpc_id
+  aws_region        = var.aws_region
+  aws_access_key = var.aws_access_key
+  aws_secret_key = var.aws_secret_key
 }
