@@ -35,7 +35,5 @@ module "ecs" {
   min_size          = var.min_size
   vpc_id            = module.new-vpc.vpc_id
   aws_region        = var.aws_region
-  aws_access_key = var.aws_access_key
-  aws_secret_key = var.aws_secret_key
   image_uri         = var.image_uri
 }
