@@ -7,3 +7,4 @@ variable "min_size" {}
 variable "vpc_id" {}
 variable "aws_region" {}
 variable "image_uri" {}
+variable "target_group_arn" {}

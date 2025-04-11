@@ -36,4 +36,5 @@ module "ecs" {
   vpc_id            = module.new-vpc.vpc_id
   aws_region        = var.aws_region
   image_uri         = var.image_uri
+  target_group_arn  = aws_lb_target_group.app.arn
 }
