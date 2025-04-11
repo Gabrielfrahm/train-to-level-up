@@ -64,7 +64,7 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   ])
-  depends_on = [aws_ecr_repository.app, aws_cloudwatch_log_group.ecs_logs]
+  depends_on = [aws_cloudwatch_log_group.ecs_logs]
 }
 
 
@@ -87,5 +87,5 @@ resource "aws_ecs_service" "app" {
     container_port   = 3333
   }
 
-  depends_on = [aws_ecr_repository.app, aws_iam_role_policy_attachment.ecs_task_execution_policy]
+  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_policy]
 }
