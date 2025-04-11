@@ -1,0 +1,120 @@
+name: Deploy to AWS with Terraform
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO_NAME: train-to-level-up
+  ECS_CLUSTER: train-to-level-up-cluster
+  ECS_SERVICE: train-to-level-up-service
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código
+      - name: 📥 Checkout do repositório
+        uses: actions/checkout@v3
+
+      # 2. Node.js (para build local da app)
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      # 3. Terraform CLI
+      - name: ⚙️ Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      # 4. Instala dependências e compila app NestJS
+      - name: 🛠️ Instalar dependências e buildar app
+        run: |
+          npm ci
+          npm run build
+
+      # 5. Autentica na AWS
+      - name: 🔐 Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 6. Login no ECR
+      - name: 🔑 Login no Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 7. Restaura state anterior (se houver)
+      # - name: 📦 Restaurar estado anterior do Terraform
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: terraform-state
+      #     path: ./terraform
+      #   continue-on-error: true
+
+      # 8. Inicializa o Terraform
+      - name: ⚙️ Terraform Init
+        working-directory: ./terraform
+        run: terraform init -reconfigure
+
+      # 9. Remove todas as imagens anteriores do ECR
+      - name: 🧼 Limpar imagens antigas no ECR
+        env:
+          AWS_REGION: ${{ env.AWS_REGION }}
+          ECR_REPO_NAME: ${{ env.ECR_REPO_NAME }}
+        run: |
+          echo "🔍 Buscando imagens no ECR..."
+          IMAGE_IDS=$(aws ecr list-images \
+            --repository-name $ECR_REPO_NAME \
+            --region $AWS_REGION \
+            --query 'imageIds' \
+            --output json)
+
+          echo "$IMAGE_IDS" > images-to-delete.json
+
+          if [ "$(jq length < images-to-delete.json)" -gt 0 ]; then
+            echo "🧹 Deletando imagens anteriores..."
+            aws ecr batch-delete-image \
+              --repository-name $ECR_REPO_NAME \
+              --region $AWS_REGION \
+              --image-ids file://images-to-delete.json
+          else
+            echo "ℹ️ Nenhuma imagem para apagar."
+          fi
+
+      # 10. Build e push da nova imagem
+      - name: 🐳 Buildar e subir nova imagem Docker
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPO_NAME }}:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/${{ env.ECR_REPO_NAME }}:$IMAGE_TAG
+
+      # 11. Confirma que a imagem foi enviada
+      - name: ✅ Verificar imagem enviada ao ECR
+        run: |
+          aws ecr describe-images \
+            --repository-name ${{ env.ECR_REPO_NAME }} \
+            --query 'imageDetails[?imageTags[0]==`${{ github.sha }}`]' \
+            --region ${{ env.AWS_REGION }}
+
+      # 12. Terraform apply (infra completa com ECS + RDS)
+      - name: 🚀 Aplicar infraestrutura com Terraform
+        working-directory: ./terraform
+        env:
+          TF_VAR_image_uri: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${{ github.sha }}
+        run: terraform apply -auto-approve
+
+    # 13. Salva o terraform.tfstate como artefato
+    # - name: 💾 Salvar terraform.tfstate
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: terraform-state
+    #     path: ./terraform/terraform.tfstate

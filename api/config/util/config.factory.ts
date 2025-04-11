@@ -6,7 +6,7 @@ export const factory = (): Config => {
   const result = configSchema.safeParse({
     env: process.env.NODE_ENV,
     port: process.env.PORT,
-    baseurl: process.env.BASE_URL,
+    // baseurl: process.env.BASE_URL,
     // mail: {
     //   from: process.env.MAIL_FROM,
     //   host: process.env.MAIL_HOST,
@@ -15,14 +15,14 @@ export const factory = (): Config => {
     //   password: process.env.MAIL_PASS,
     //   domain: process.env.MAIL_DOMAIN,
     // },
-    database: {
-      host: process.env.DATABASE_HOST,
-      database: process.env.DATABASE_NAME,
-      password: process.env.DATABASE_PASSWORD,
-      port: process.env.DATABASE_PORT,
-      url: process.env.DATABASE_URL,
-      username: process.env.DATABASE_USERNAME,
-    },
+    // database: {
+    //   host: process.env.DATABASE_HOST,
+    //   database: process.env.DATABASE_NAME,
+    //   password: process.env.DATABASE_PASSWORD,
+    //   port: process.env.DATABASE_PORT,
+    //   url: process.env.DATABASE_URL,
+    //   username: process.env.DATABASE_USERNAME,
+    // },
   });
 
   if (result.success) {

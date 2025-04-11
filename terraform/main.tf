@@ -7,11 +7,15 @@ terraform {
     }
     local = ">=2.1.0"
   }
+  backend "s3" {
+    bucket = "train-to-level-up-tfstate"
+    key    = "terraform/ecs.tfstate"
+    region = "us-east-1"
+    encrypt = true
+  }
 }
 
 provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
   region     = var.aws_region
 }
 
@@ -33,4 +37,5 @@ module "ecs" {
   aws_region        = var.aws_region
   aws_access_key = var.aws_access_key
   aws_secret_key = var.aws_secret_key
+  image_uri         = var.image_uri
 }

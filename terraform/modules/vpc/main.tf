@@ -1,5 +1,7 @@
 resource "aws_vpc" "new-vpc" {
   cidr_block = var.vpc_cidr_block
+  enable_dns_support = true
+  enable_dns_hostnames = true
   tags = {
       Name = "${var.prefix}-vpc"
   }
@@ -42,25 +44,35 @@ resource "aws_route_table_association" "new-rtb-association" {
   subnet_id = aws_subnet.subnets.*.id[count.index]
 }
 
-resource "aws_security_group" "sg" {
+resource "aws_security_group" "app" {
+  name        = "${var.prefix}-sg"
+  description = "Allow HTTP inbound"
   vpc_id = aws_vpc.new-vpc.id
 
-  ingress  {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    self = false
+  ingress {
+    description = "Allow HTTP public port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all inbound traffic"
   }
+
+  ingress {
+    description = "Allow ECS container port 3333"
+    from_port   = 3333
+    to_port     = 3333
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
-      from_port = 0
-      to_port = 0
-      protocol = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-      prefix_list_ids = []
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
+
   tags = {
-      Name = "${var.prefix}-sg"
+    Name = "${var.prefix}-sg"
   }
 }

@@ -1,0 +1,45 @@
+name: Destroy AWS Infrastructure
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPO_NAME: train-to-level-up
+  ECS_CLUSTER: train-to-level-up-cluster
+  ECS_SERVICE: train-to-level-up-service
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v3
+
+      - name: 🧰 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: ⚙️ Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: 🔐 Configurar credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ⚙️ Terraform Init com backend remoto
+        working-directory: ./terraform
+        run: terraform init -reconfigure
+
+      - name: 🧨 Executar Terraform Destroy
+        working-directory: ./terraform
+        env:
+          TF_VAR_image_uri: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${{ github.sha }}
+        run: terraform destroy -auto-approve
