@@ -76,9 +76,9 @@ resource "aws_ecs_service" "app" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = module.new-vpc.private_subnet_ids
+    subnets         = var.subnet_ids
     assign_public_ip = true
-    security_groups = [module.new-vpc.security_group_id]
+    security_groups = [var.security_group_id]
   }
 
   load_balancer {
