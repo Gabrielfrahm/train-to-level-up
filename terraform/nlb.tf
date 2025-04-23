@@ -43,7 +43,7 @@ resource "aws_lb" "nlb" {
   name               = "${var.prefix}-nlb"
   internal           = false
   load_balancer_type = "network"
-  subnets            = var.public_subnets
+  subnets            = module.new-vpc.subnet_ids
 }
 
 resource "aws_lb_target_group" "ecs_target_group" {
@@ -51,7 +51,7 @@ resource "aws_lb_target_group" "ecs_target_group" {
   port        = 3333
   protocol    = "TCP"
   target_type = "ip"
-  vpc_id      = var.vpc_id
+  vpc_id      = module.new-vpc.vpc_id
 
   health_check {
     protocol = "TCP"

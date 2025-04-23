@@ -33,7 +33,7 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.prefix}-task"
-  requires_compatibilities = ["FARGATE_SPOT"]
+  requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = "256"
   memory                   = "512"
@@ -73,7 +73,12 @@ resource "aws_ecs_service" "app" {
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = 1
-  launch_type     = "FARGATE_SPOT"
+  launch_type     = "FARGATE"
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+  }
 
   network_configuration {
     subnets         = var.subnet_ids
