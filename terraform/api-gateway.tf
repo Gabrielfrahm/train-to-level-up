@@ -6,8 +6,8 @@ resource "aws_apigatewayv2_api" "http_api" {
 
 resource "aws_apigatewayv2_vpc_link" "ecs_link" {
   name               = "${var.prefix}-vpc-link"
-  subnet_ids         = var.public_subnets # ou subnets privadas se preferir
-  security_group_ids = [var.api_gw_sg_id] # se necessário (geralmente não obrigatório com NLB)
+  subnet_ids         =  module.new-vpc.subnet_ids
+  security_group_ids = [module.new-vpc.security_group_id]
 }
 
 resource "aws_apigatewayv2_integration" "ecs_integration" {
