@@ -26,8 +26,8 @@ resource "aws_apigatewayv2_route" "root_proxy" {
   target    = "integrations/${aws_apigatewayv2_integration.ecs_integration.id}"
 }
 
-resource "aws_apigatewayv2_stage" "prod" {
+resource "aws_apigatewayv2_stage" "dev" {
   api_id      = aws_apigatewayv2_api.http_api.id
-  name        = "prod"
+  name        = "dev"
   auto_deploy = true
 }
