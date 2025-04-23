@@ -6,7 +6,7 @@ services:
     container_name: train-to-level-up
     volumes:
       - .:/usr/api/app
-    command: yarn start:dev
+    command: npm run start:dev
     networks:
       - train-to-level-up
     environment:

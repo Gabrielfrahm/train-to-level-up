@@ -8,6 +8,7 @@ import { EitherExceptionFilter } from './error.handler';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors();
 
   // middleware para logar as rotas chamadas
