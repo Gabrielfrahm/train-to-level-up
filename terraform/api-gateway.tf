@@ -1,32 +1,33 @@
-resource "aws_api_gateway_vpc_link" "ecs_link" {
-  name        = "${var.prefix}-vpc-link"
-  target_arns = [aws_lb.nlb.arn]
+
+resource "aws_apigatewayv2_api" "http_api" {
+  name          = "${var.prefix}-http-api"
+  protocol_type = "HTTP"
 }
 
-resource "aws_api_gateway_rest_api" "api" {
-  name = "${var.prefix}-gateway"
+resource "aws_apigatewayv2_vpc_link" "ecs_link" {
+  name               = "${var.prefix}-vpc-link"
+  subnet_ids         = var.public_subnets # ou subnets privadas se preferir
+  security_group_ids = [var.api_gw_sg_id] # se necessário (geralmente não obrigatório com NLB)
 }
 
-resource "aws_api_gateway_method" "root_method" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_rest_api.api.root_resource_id
-  http_method   = "ANY"
-  authorization = "NONE"
+resource "aws_apigatewayv2_integration" "ecs_integration" {
+  api_id                 = aws_apigatewayv2_api.http_api.id
+  integration_type       = "HTTP_PROXY"
+  connection_type        = "VPC_LINK"
+  connection_id          = aws_apigatewayv2_vpc_link.ecs_link.id
+  integration_method     = "ANY"
+  integration_uri        = "http://${aws_lb.nlb.dns_name}:3333"
+  payload_format_version = "1.0"
 }
 
-resource "aws_api_gateway_integration" "nlb_integration" {
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_rest_api.api.root_resource_id
-  http_method             = aws_api_gateway_method.root_method.http_method
-  integration_http_method = "ANY"
-  type                    = "HTTP"
-  uri                     = "http://${aws_lb.nlb.dns_name}:3333/"
-  connection_type         = "VPC_LINK"
-  connection_id           = aws_api_gateway_vpc_link.ecs_link.id
+resource "aws_apigatewayv2_route" "root_proxy" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "ANY /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.ecs_integration.id}"
 }
 
-resource "aws_api_gateway_deployment" "deploy" {
-  depends_on = [aws_api_gateway_integration.nlb_integration]
-
-  rest_api_id = aws_api_gateway_rest_api.api.id
+resource "aws_apigatewayv2_stage" "prod" {
+  api_id      = aws_apigatewayv2_api.http_api.id
+  name        = "prod"
+  auto_deploy = true
 }
