@@ -33,7 +33,7 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
 
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.prefix}-task"
-  requires_compatibilities = ["FARGATE"]
+  requires_compatibilities = ["FARGATE_SPOT"]
   network_mode             = "awsvpc"
   cpu                      = "256"
   memory                   = "512"
@@ -73,7 +73,7 @@ resource "aws_ecs_service" "app" {
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = 1
-  launch_type     = "FARGATE"
+  launch_type     = "FARGATE_SPOT"
 
   network_configuration {
     subnets         = var.subnet_ids
@@ -81,11 +81,17 @@ resource "aws_ecs_service" "app" {
     security_groups = [var.security_group_id]
   }
 
+  # load_balancer {
+  #   target_group_arn = var.target_group_arn
+  #   container_name   = "app"
+  #   container_port   = 3333
+  # }
+
   load_balancer {
-    target_group_arn = var.target_group_arn
-    container_name   = "app"
-    container_port   = 3333
-  }
+  target_group_arn = var.target_group_arn
+  container_name   = "app"
+  container_port   = 3333
+}
 
   depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_policy]
 }
