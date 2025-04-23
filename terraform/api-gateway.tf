@@ -16,7 +16,7 @@ resource "aws_apigatewayv2_integration" "ecs_integration" {
   connection_type        = "VPC_LINK"
   connection_id          = aws_apigatewayv2_vpc_link.ecs_link.id
   integration_method     = "ANY"
-  integration_uri        = "http://${aws_lb.nlb.dns_name}:3333"
+  integration_uri        = aws_lb_listener.nlb_listener.arn
   payload_format_version = "1.0"
 }
 
