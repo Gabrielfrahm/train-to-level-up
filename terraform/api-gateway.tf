@@ -1,5 +1,5 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name = "${var.prefix}-rest-api"
+  name = "${var.prefix}-gateway"
 }
 
 resource "aws_api_gateway_resource" "proxy" {
@@ -13,6 +13,10 @@ resource "aws_api_gateway_method" "proxy_method" {
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "ANY"
   authorization = "NONE"
+
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "proxy_integration" {
@@ -29,30 +33,13 @@ resource "aws_api_gateway_integration" "proxy_integration" {
   }
 }
 
-resource "aws_api_gateway_method_settings" "all" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = aws_api_gateway_stage.stage.stage_name
-  method_path = "*/*"
-
-  settings {
-    metrics_enabled = true
-    logging_level   = "INFO"
-    data_trace_enabled = true
-  }
-}
-
-resource "aws_api_gateway_deployment" "deployment" {
+resource "aws_api_gateway_deployment" "deploy" {
   depends_on  = [aws_api_gateway_integration.proxy_integration]
   rest_api_id = aws_api_gateway_rest_api.api.id
-  stage_name  = "ignored"
 }
 
 resource "aws_api_gateway_stage" "stage" {
-  deployment_id = aws_api_gateway_deployment.deployment.id
+  deployment_id = aws_api_gateway_deployment.deploy.id
   rest_api_id   = aws_api_gateway_rest_api.api.id
   stage_name    = "prod"
-}
-
-output "api_gateway_url" {
-  value = "https://${aws_api_gateway_rest_api.api.id}.execute-api.${var.aws_region}.amazonaws.com/${aws_api_gateway_stage.stage.stage_name}"
 }
