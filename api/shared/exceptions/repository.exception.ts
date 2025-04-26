@@ -1,7 +1,6 @@
 export class RepositoryException extends Error {
-  constructor(message: string, status: number) {
+  constructor(message: string) {
     const bodyError = {
-      code: status,
       body: {
         message: message,
         shortMessage: message.toLowerCase(),

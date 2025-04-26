@@ -8,7 +8,6 @@ export type Output = {
 export class InvalidDtoError extends Error {
   constructor(message?: Output) {
     const bodyError = {
-      code: 400,
       body: {
         message: message || 'Invalid Field',
         shortMessage: 'invalidField',

@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 
 import { Logger } from '@nestjs/common';
 import { CustomValidationPipe } from './class-validation.pipe';
-import { WinstonLoggerService } from '@modules/logger/logger.service';
-import { EitherExceptionFilter } from './error.handler';
+
+import { EitherExceptionFilter } from './error.filter';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -19,12 +19,14 @@ async function bootstrap(): Promise<void> {
     next();
   });
 
+  app.useLogger(new Logger());
+
   app.useGlobalPipes(new CustomValidationPipe());
 
   const httpAdapterHost = app.get(HttpAdapterHost);
 
   app.useGlobalFilters(
-    new EitherExceptionFilter(httpAdapterHost, new WinstonLoggerService()),
+    new EitherExceptionFilter(httpAdapterHost, new Logger()),
   );
 
   await app.listen(process.env.PORT);
