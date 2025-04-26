@@ -118,3 +118,17 @@ jobs:
     #   with:
     #     name: terraform-state
     #     path: ./terraform/terraform.tfstate
+      # 13. Captura do endpoint do RDS
+      - name: 📤 Pegar o endpoint do RDS
+        id: rds
+        working-directory: ./terraform
+        run: |
+          echo "RDS_ENDPOINT=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
+
+      # 14. Rodar Prisma depois do banco criado
+      - name: 📜 Rodar Prisma Migrate
+        env:
+          DATABASE_URL: postgres://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@${{ env.RDS_ENDPOINT }}:5432/${{ secrets.DB_DATABASE }}?schema=public
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
