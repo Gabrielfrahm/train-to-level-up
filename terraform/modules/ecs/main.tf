@@ -53,6 +53,10 @@ resource "aws_ecs_task_definition" "app" {
       environment = [
         { name = "PORT", value = "3333" },
         { name = "NODE_ENV", value = "development" },
+        { name = "DB_PORT", value = var.db_port },
+        { name = "DB_USERNAME", value = var.db_username },
+        { name = "DB_PASSWORD", value = var.db_password },
+        { name = "DB_NAME", value = var.db_name }
       ],
       logConfiguration = {
         logDriver = "awslogs",
@@ -93,10 +97,10 @@ resource "aws_ecs_service" "app" {
   # }
 
   load_balancer {
-  target_group_arn = var.target_group_arn
-  container_name   = "app"
-  container_port   = 3333
-}
+    target_group_arn = var.target_group_arn
+    container_name   = "app"
+    container_port   = 3333
+  }
 
   depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_policy]
 }

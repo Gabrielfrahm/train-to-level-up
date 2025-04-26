@@ -4,3 +4,6 @@ vpc_cidr_block = "10.0.0.0/16"
 desired_size   = 2
 max_size       = 3
 min_size       = 1
+db_username    = "traintolevelup"
+db_password    = "traintolevelup"
+db_name        = "traintolevelup"

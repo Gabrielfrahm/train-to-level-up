@@ -37,4 +37,7 @@ module "ecs" {
   aws_region        = var.aws_region
   image_uri         = var.image_uri
   target_group_arn  = aws_lb_target_group.ecs_target_group.arn
+  db_username       = var.db_username
+  db_password       = var.db_password
+  db_name           = var.db_name
 }
