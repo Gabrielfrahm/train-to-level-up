@@ -25,7 +25,7 @@ resource "aws_db_instance" "postgres" {
   multi_az               = false
   backup_retention_period = 0
 
-  vpc_security_group_ids = [module.vpc-new.rds_security_group_id]
+  vpc_security_group_ids = [module.new-vpc.rds_security_group_id]
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name
 
   tags = {
