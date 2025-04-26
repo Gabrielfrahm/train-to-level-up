@@ -128,12 +128,11 @@ jobs:
       # 14. Rodar Prisma depois do banco criado
       - name: 📜 Rodar Prisma Migrate
         env:
-          RDS_ENDPOINT: ${{ env.RDS_ENDPOINT }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_DATABASE }}
-          DB_URL: postgres://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@${{ env.RDS_ENDPOINT }}:5432/${{ secrets.DB_DATABASE }}
-          DATABASE_URL: postgres://${{ secrets.DB_USERNAME }}:${{ secrets.DB_PASSWORD }}@${{ env.RDS_ENDPOINT }}:5432/${{ secrets.DB_DATABASE }}
         run: |
+          echo "Montando DATABASE_URL dinamicamente..."
+          export DATABASE_URL=postgres://$DB_USERNAME:$DB_PASSWORD@$RDS_ENDPOINT:5432/$DB_NAME
           npx prisma generate
           npx prisma migrate deploy
