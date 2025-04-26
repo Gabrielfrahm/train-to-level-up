@@ -14,3 +14,4 @@ variable "db_name" {}
 variable "db_port" {
   default = "5432"
 }
+variable "db_host" {}

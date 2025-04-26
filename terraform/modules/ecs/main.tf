@@ -56,7 +56,9 @@ resource "aws_ecs_task_definition" "app" {
         { name = "DB_PORT", value = var.db_port },
         { name = "DB_USERNAME", value = var.db_username },
         { name = "DB_PASSWORD", value = var.db_password },
-        { name = "DB_NAME", value = var.db_name }
+        { name = "DB_NAME", value = var.db_name },
+        { name = "DB_HOST", value = var.db_host },
+        { name = "DB_URL",  value = "postgres://${var.db_username}:${var.db_password}@${var.db_host}:${var.db_port}/${var.db_name}" }
       ],
       logConfiguration = {
         logDriver = "awslogs",

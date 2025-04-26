@@ -15,14 +15,14 @@ export const factory = (): Config => {
     //   password: process.env.MAIL_PASS,
     //   domain: process.env.MAIL_DOMAIN,
     // },
-    // database: {
-    //   host: process.env.DATABASE_HOST,
-    //   database: process.env.DATABASE_NAME,
-    //   password: process.env.DATABASE_PASSWORD,
-    //   port: process.env.DATABASE_PORT,
-    //   url: process.env.DATABASE_URL,
-    //   username: process.env.DATABASE_USERNAME,
-    // },
+    database: {
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      password: process.env.DB_PASSWORD,
+      port: process.env.DB_PORT,
+      url: process.env.DB_URL,
+      username: process.env.DB_USERNAME,
+    },
   });
 
   if (result.success) {
