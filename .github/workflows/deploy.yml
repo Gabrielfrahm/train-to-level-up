@@ -132,7 +132,8 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_DATABASE }}
         run: |
-          echo "Montando DATABASE_URL dinamicamente..."
+          echo "Montando DATABASE_URL e DB_URL dinamicamente..."
           export DATABASE_URL=postgres://$DB_USERNAME:$DB_PASSWORD@$RDS_ENDPOINT:5432/$DB_NAME
+          export DB_URL=$DATABASE_URL
           npx prisma generate
           npx prisma migrate deploy
