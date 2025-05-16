@@ -58,19 +58,18 @@ jobs:
               exit 1
             fi
 
+            ROOT_DIR=$(pwd)  # <- logo no início do script
+
             mkdir -p dist_bundle
             cp -r dist/* dist_bundle/
             cp package.json dist_bundle/
             npm install --omit=dev --prefix dist_bundle
 
-            # ainda dentro de lambdas/$lambda
             cd dist_bundle
             zip -r "../$lambda.zip" . || { echo "❌ Falha ao zipar $lambda"; exit 1; }
             cd ..
 
-            # move zip gerado para o terraform
-            mv "$lambda.zip" ../../../terraform/lambda_zips/
-
+            mv "$lambda.zip" "$ROOT_DIR/terraform/lambda_zips/"
             rm -rf dist_bundle
             popd
 
