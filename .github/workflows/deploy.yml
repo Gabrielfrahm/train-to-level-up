@@ -33,17 +33,28 @@ jobs:
 
       - name: 📦 Buildar e zipar Lambdas
         run: |
+          set -e  # Sai ao primeiro erro
+
           mkdir -p terraform/lambda_zips
 
           for lambda in createAuthChallenge defineAuthChallenge verifyAuthChallenge; do
             echo "🔧 Buildando $lambda..."
+
+            if [ ! -d "lambdas/$lambda" ]; then
+              echo "❌ Pasta lambdas/$lambda não encontrada!"
+              exit 1
+            fi
+
             pushd lambdas/$lambda
 
+            echo "📦 Instalando dependências..."
             npm ci
-            npm run build
 
-            if [ ! -d dist ]; then
-              echo "❌ ERRO: pasta dist não encontrada para $lambda"
+            echo "🔨 Rodando build (tsc)..."
+            npx tsc || { echo "❌ Erro ao compilar $lambda"; exit 1; }
+
+            if [ ! -d "dist" ]; then
+              echo "❌ Build falhou: dist não gerada"
               exit 1
             fi
 
@@ -53,12 +64,15 @@ jobs:
             npm install --omit=dev --prefix dist_bundle
 
             pushd dist_bundle
-            zip -r "../../../../terraform/lambda_zips/$lambda.zip" . > /dev/null
+            zip -r "../../../../terraform/lambda_zips/$lambda.zip" . || { echo "❌ Falha ao zipar $lambda"; exit 1; }
             popd
 
             rm -rf dist_bundle
             popd
+
+            echo "✅ $lambda finalizada com sucesso"
           done
+
 
       # 4. Instala dependências e compila app NestJS
       - name: 🛠️ Instalar dependências e buildar app
