@@ -63,9 +63,13 @@ jobs:
             cp package.json dist_bundle/
             npm install --omit=dev --prefix dist_bundle
 
-            pushd dist_bundle
-            zip -r "../../../../terraform/lambda_zips/$lambda.zip" . || { echo "❌ Falha ao zipar $lambda"; exit 1; }
-            popd
+            # ainda dentro de lambdas/$lambda
+            cd dist_bundle
+            zip -r "../$lambda.zip" . || { echo "❌ Falha ao zipar $lambda"; exit 1; }
+            cd ..
+
+            # move zip gerado para o terraform
+            mv "$lambda.zip" ../../../terraform/lambda_zips/
 
             rm -rf dist_bundle
             popd
