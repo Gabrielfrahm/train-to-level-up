@@ -31,28 +31,33 @@ jobs:
         with:
           terraform_version: 1.7.5
 
-         # 🛠️ Build e zip das Lambdas
       - name: 📦 Buildar e zipar Lambdas
         run: |
           mkdir -p terraform/lambda_zips
 
           for lambda in createAuthChallenge defineAuthChallenge verifyAuthChallenge; do
             echo "🔧 Buildando $lambda..."
-            cd lambdas/$lambda
+            pushd lambdas/$lambda
 
             npm ci
             npm run build
+
+            if [ ! -d dist ]; then
+              echo "❌ ERRO: pasta dist não encontrada para $lambda"
+              exit 1
+            fi
 
             mkdir -p dist_bundle
             cp -r dist/* dist_bundle/
             cp package.json dist_bundle/
             npm install --omit=dev --prefix dist_bundle
 
-            cd dist_bundle
-            zip -r ../../../../terraform/lambda_zips/$lambda.zip . > /dev/null
-            cd ../../
+            pushd dist_bundle
+            zip -r "../../../../terraform/lambda_zips/$lambda.zip" . > /dev/null
+            popd
+
             rm -rf dist_bundle
-            cd ../..
+            popd
           done
 
       # 4. Instala dependências e compila app NestJS
