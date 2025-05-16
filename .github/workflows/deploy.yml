@@ -33,19 +33,19 @@ jobs:
 
       - name: 📦 Buildar e zipar Lambdas
         run: |
-          set -e  # Sai ao primeiro erro
-
-          mkdir -p terraform/lambda_zips
+          set -e
+          ROOT_DIR=$(pwd)  # 👈 agora está correto!
+          mkdir -p "$ROOT_DIR/terraform/lambda_zips"
 
           for lambda in createAuthChallenge defineAuthChallenge verifyAuthChallenge; do
             echo "🔧 Buildando $lambda..."
 
-            if [ ! -d "lambdas/$lambda" ]; then
+            if [ ! -d "$ROOT_DIR/lambdas/$lambda" ]; then
               echo "❌ Pasta lambdas/$lambda não encontrada!"
               exit 1
             fi
 
-            pushd lambdas/$lambda
+            pushd "$ROOT_DIR/lambdas/$lambda"
 
             echo "📦 Instalando dependências..."
             npm ci
@@ -53,12 +53,10 @@ jobs:
             echo "🔨 Rodando build (tsc)..."
             npx tsc || { echo "❌ Erro ao compilar $lambda"; exit 1; }
 
-            if [ ! -d "dist" ]; then
+            if [ ! -d dist ]; then
               echo "❌ Build falhou: dist não gerada"
               exit 1
             fi
-
-            ROOT_DIR=$(pwd)  # <- logo no início do script
 
             mkdir -p dist_bundle
             cp -r dist/* dist_bundle/
@@ -71,6 +69,7 @@ jobs:
 
             mv "$lambda.zip" "$ROOT_DIR/terraform/lambda_zips/"
             rm -rf dist_bundle
+
             popd
 
             echo "✅ $lambda finalizada com sucesso"
