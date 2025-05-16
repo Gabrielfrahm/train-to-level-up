@@ -8,3 +8,5 @@ variable "image_uri" {}
 variable "db_username" {}
 variable "db_password" {}
 variable "db_name" {}
+variable "gmail_user" {}
+variable "gmail_password" {}

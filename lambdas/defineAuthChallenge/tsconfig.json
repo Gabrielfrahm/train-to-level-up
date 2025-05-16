@@ -17,12 +17,6 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@shared/*": ["api/shared/*"],
-      "@config/*": ["api/config/*"],
-      "@modules/*": ["api/modules/*"]
-    }
   },
-  "include": ["tests", "api", "jest-unit.config.js", ],
-  "exclude": ["node_modules", "dist"]
+  "include": ["index.ts"]
 }

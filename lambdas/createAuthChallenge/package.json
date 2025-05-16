@@ -1,0 +1,19 @@
+{
+  "name": "createauthchallenge",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "aws-sdk": "^2.1692.0",
+    "nodemailer": "^7.0.3"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "typescript": "^5.8.3"
+  }
+}
