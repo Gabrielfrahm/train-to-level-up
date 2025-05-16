@@ -34,6 +34,36 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      - name: 📦 Buildar e zipar Lambdas
+        run: |
+          set -e
+          ROOT_DIR=$(pwd)
+          mkdir -p "$ROOT_DIR/terraform/lambda_zips"
+
+          for lambda in createAuthChallenge defineAuthChallenge verifyAuthChallenge; do
+            echo "🔧 Buildando $lambda..."
+
+            pushd "$ROOT_DIR/lambdas/$lambda"
+
+            npm ci
+            npm run build
+
+            mkdir -p dist_bundle
+            cp -r dist/* dist_bundle/
+            cp package.json dist_bundle/
+            npm install --omit=dev --prefix dist_bundle
+
+            cd dist_bundle
+            zip -r "../$lambda.zip" .
+            cd ..
+
+            mv "$lambda.zip" "$ROOT_DIR/terraform/lambda_zips/"
+            rm -rf dist_bundle
+            popd
+
+            echo "✅ $lambda finalizada com sucesso"
+          done
+
       - name: ⚙️ Terraform Init com backend remoto
         working-directory: ./terraform
         run: terraform init -reconfigure
@@ -41,7 +71,7 @@ jobs:
       - name: 🧨 Executar Terraform Destroy
         working-directory: ./terraform
         env:
-          TF_VAR_image_uri: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:${{ github.sha }}
+          TF_VAR_image_uri: dummy  # Se for necessário, ou remova se não usar mais
           TF_VAR_gmail_user: ${{ secrets.GMAIL_USER }}
           TF_VAR_gmail_password: ${{ secrets.GMAIL_PASSWORD }}
         run: terraform destroy -auto-approve
