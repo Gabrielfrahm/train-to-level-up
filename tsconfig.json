@@ -23,6 +23,6 @@
       "@modules/*": ["api/modules/*"]
     }
   },
-  "include": ["tests", "api", "jest-unit.config.js", "lambdas/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["tests", "api", "jest-unit.config.js"],
+  "exclude": ["node_modules", "dist", "lambdas/**/*.ts"]
 }

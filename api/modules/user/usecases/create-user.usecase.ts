@@ -33,8 +33,8 @@ export class CreateUserUseCase
     try {
       await this.cognito.send(
         new AdminInitiateAuthCommand({
-          UserPoolId: process.env.COGNITO_USER_POOL_ID,
-          ClientId: process.env.COGNITO_CLIENT_ID,
+          UserPoolId: process.env.COGNITO_USER_POOL_ID || '',
+          ClientId: process.env.COGNITO_CLIENT_ID || '',
           AuthFlow: 'CUSTOM_AUTH',
           AuthParameters: {
             USERNAME: email,
