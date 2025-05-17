@@ -32,7 +32,7 @@ export class CreateUserUseCase
         }),
       );
     } catch (err) {
-      return left(new Error(`Erro ao iniciar autenticação no Cognito: ${err}`));
+      return left(new Error(`Erro ao tentar cadastrar no Cognito: ${err}`));
     }
     const user = await this.userRepository.create(UserEntity.CreateNew(input));
     if (user.isLeft()) {

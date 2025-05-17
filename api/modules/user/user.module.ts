@@ -4,6 +4,7 @@ import { UserController } from './user.controller';
 import { PrismaService } from '@modules/database/prisma/prisma.service';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserUseCase } from './usecases/create-user.usecase';
+import { AuthUserUseCase } from './usecases/login-user.usecase';
 
 @Module({
   imports: [],
@@ -18,6 +19,7 @@ import { CreateUserUseCase } from './usecases/create-user.usecase';
       inject: [PrismaService],
     },
     CreateUserUseCase,
+    AuthUserUseCase,
   ],
   exports: ['userRepository'],
 })
