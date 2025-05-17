@@ -1,6 +1,6 @@
 import {
   CognitoIdentityProviderClient,
-  AdminInitiateAuthCommand,
+  AdminCreateUserCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { BaseUseCase } from '@shared/interfaces/usecase.interfaces';
 import { CreateUserDto, OutputUserDto } from '../dtos/user.dto';
@@ -24,13 +24,11 @@ export class CreateUserUseCase
     });
     try {
       await cognito.send(
-        new AdminInitiateAuthCommand({
+        new AdminCreateUserCommand({
           UserPoolId: process.env.COGNITO_USER_POOL_ID,
-          ClientId: process.env.COGNITO_CLIENT_ID,
-          AuthFlow: 'CUSTOM_AUTH',
-          AuthParameters: {
-            USERNAME: input.email,
-          },
+          Username: input.email,
+          UserAttributes: [{ Name: 'email', Value: input.email }],
+          MessageAction: 'SUPPRESS',
         }),
       );
     } catch (err) {
