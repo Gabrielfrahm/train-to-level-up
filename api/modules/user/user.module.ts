@@ -5,6 +5,7 @@ import { PrismaService } from '@modules/database/prisma/prisma.service';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserUseCase } from './usecases/create-user.usecase';
 import { AuthUserUseCase } from './usecases/login-user.usecase';
+import { AuthStep2UserUseCase } from './usecases/login-user-step-2.usecase';
 
 @Module({
   imports: [],
@@ -20,6 +21,7 @@ import { AuthUserUseCase } from './usecases/login-user.usecase';
     },
     CreateUserUseCase,
     AuthUserUseCase,
+    AuthStep2UserUseCase,
   ],
   exports: ['userRepository'],
 })
