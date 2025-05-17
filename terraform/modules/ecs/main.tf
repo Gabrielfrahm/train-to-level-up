@@ -58,7 +58,9 @@ resource "aws_ecs_task_definition" "app" {
         { name = "DB_PASSWORD", value = var.db_password },
         { name = "DB_NAME", value = var.db_name },
         { name = "DB_HOST", value = var.db_host },
-        { name = "DB_URL",  value = "postgres://${var.db_username}:${var.db_password}@${var.db_host}:${var.db_port}/${var.db_name}" }
+        { name = "DB_URL",  value = "postgres://${var.db_username}:${var.db_password}@${var.db_host}:${var.db_port}/${var.db_name}" },
+        { name = "COGNITO_USER_POOL_ID", value = var.cognito_user_pool_id },
+        { name = "COGNITO_CLIENT_ID", value = var.cognito_user_pool_client_id }
       ],
       logConfiguration = {
         logDriver = "awslogs",

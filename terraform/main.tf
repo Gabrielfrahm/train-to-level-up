@@ -41,4 +41,6 @@ module "ecs" {
   db_password       = var.db_password
   db_name           = var.db_name
   db_host           = aws_db_instance.rds_postgres.address
+  cognito_user_pool_id = aws_cognito_user_pool.main.id
+  cognito_user_pool_client_id = aws_cognito_user_pool_client.app_client.id
 }

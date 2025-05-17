@@ -23,6 +23,10 @@ export const factory = (): Config => {
       url: process.env.DB_URL,
       username: process.env.DB_USERNAME,
     },
+    cognito: {
+      userPoolId: process.env.COGNITO_USER_POOL_ID,
+      clientId: process.env.COGNITO_CLIENT_ID,
+    },
   });
 
   if (result.success) {

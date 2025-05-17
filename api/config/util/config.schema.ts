@@ -27,3 +27,8 @@ export const configSchema = z.object({
   // mail: MailSchema,
   database: DatabaseSchema,
 });
+
+export const cognitoSchema = z.object({
+  userPoolId: z.string(),
+  clientId: z.string(),
+});
