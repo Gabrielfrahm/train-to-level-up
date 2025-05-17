@@ -13,36 +13,32 @@ import { UserEntity } from '../entities/user.entity';
 export class CreateUserUseCase
   implements BaseUseCase<CreateUserDto, Either<Error, OutputUserDto>>
 {
-  private readonly cognito = new CognitoIdentityProviderClient({
-    region: 'us-east-1',
-  });
-
   constructor(
     @Inject('userRepository')
     private readonly userRepository: UserRepositoryInterface,
   ) {}
 
   async execute(input: CreateUserDto): Promise<Either<Error, OutputUserDto>> {
-    const user = await this.userRepository.create(UserEntity.CreateNew(input));
-    if (user.isLeft()) {
-      return left(user.value);
-    }
-
-    const email = input.email;
-
+    const cognito = new CognitoIdentityProviderClient({
+      region: 'us-east-1',
+    });
     try {
-      await this.cognito.send(
+      await cognito.send(
         new AdminInitiateAuthCommand({
           UserPoolId: process.env.COGNITO_USER_POOL_ID,
           ClientId: process.env.COGNITO_CLIENT_ID,
           AuthFlow: 'CUSTOM_AUTH',
           AuthParameters: {
-            USERNAME: email,
+            USERNAME: input.email,
           },
         }),
       );
     } catch (err) {
       return left(new Error(`Erro ao iniciar autenticação no Cognito: ${err}`));
+    }
+    const user = await this.userRepository.create(UserEntity.CreateNew(input));
+    if (user.isLeft()) {
+      return left(user.value);
     }
 
     return right({

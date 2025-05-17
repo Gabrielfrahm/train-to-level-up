@@ -31,6 +31,26 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
   }
 }
 
+resource "aws_iam_role_policy" "ecs_task_cognito_policy" {
+  name = "ecs-task-cognito-access"
+  role = aws_iam_role.ecs_task_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "cognito-idp:AdminInitiateAuth",
+          "cognito-idp:AdminCreateUser",
+          "cognito-idp:RespondToAuthChallenge"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_ecs_task_definition" "app" {
   family                   = "${var.prefix}-task"
   requires_compatibilities = ["FARGATE"]
@@ -38,6 +58,7 @@ resource "aws_ecs_task_definition" "app" {
   cpu                      = "256"
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_execution.arn
 
   container_definitions = jsonencode([
     {
