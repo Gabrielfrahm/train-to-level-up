@@ -4,8 +4,14 @@ meta {
   seq: 2
 }
 
-get {
+post {
   url: {{base_url}}/users/auth
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "email": "gabriel.mfrahm@gmail.com"
+  }
 }
