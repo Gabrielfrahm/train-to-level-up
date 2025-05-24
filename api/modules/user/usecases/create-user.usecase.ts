@@ -21,16 +21,19 @@ export class CreateUserUseCase
   ) {}
 
   async execute(input: CreateUserDto): Promise<Either<Error, OutputUserDto>> {
+    console.log('creating user', input);
     const cognitoCommand = await this.cognitoClient.createUser(input);
-
+    console.log('cognitoCommand', cognitoCommand);
     if (cognitoCommand.isLeft()) {
       return left(cognitoCommand.value);
     }
-
+    console.log('will try create user.....');
     const user = await this.userRepository.create(UserEntity.CreateNew(input));
+    console.log('user', user);
     if (user.isLeft()) {
       return left(user.value);
     }
+    console.log('create success', user);
 
     return right({
       email: user.value.getEmail(),

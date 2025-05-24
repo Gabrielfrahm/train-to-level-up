@@ -36,6 +36,7 @@ export class CognitoClient {
       });
 
       await this.cognito.send(command);
+      return right(true);
     } catch (error) {
       console.error('Error creating user:', error);
       return left(error);

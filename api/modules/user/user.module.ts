@@ -38,6 +38,6 @@ import { COGNITO_CLIENT, CognitoClient } from '@shared/clients/cognito.client';
       useClass: CreateUserUseCase,
     },
   ],
-  exports: [USER_REPOSITORY_USER_REPOSITORY],
+  exports: [USER_REPOSITORY_USER_REPOSITORY, CREATE_USER_USE_CASE],
 })
 export class UserModule {}
