@@ -1,39 +1,32 @@
-import {
-  CognitoIdentityProviderClient,
-  AdminCreateUserCommand,
-} from '@aws-sdk/client-cognito-identity-provider';
 import { BaseUseCase } from '@shared/interfaces/usecase.interfaces';
 import { CreateUserDto, OutputUserDto } from '../dtos/user.dto';
 import { Either, left, right } from '@shared/either';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, InjectionToken } from '@nestjs/common';
 import { UserRepositoryInterface } from '../interfaces/user.repository.interface';
 import { UserEntity } from '../entities/user.entity';
+import { USER_REPOSITORY_USER_REPOSITORY } from '../repositories/user.repository';
+import { COGNITO_CLIENT, CognitoClient } from '@shared/clients/cognito.client';
+
+export const CREATE_USER_USE_CASE: InjectionToken = Symbol('CreateUserUseCase');
 
 @Injectable()
 export class CreateUserUseCase
   implements BaseUseCase<CreateUserDto, Either<Error, OutputUserDto>>
 {
   constructor(
-    @Inject('userRepository')
+    @Inject(USER_REPOSITORY_USER_REPOSITORY)
     private readonly userRepository: UserRepositoryInterface,
+    @Inject(COGNITO_CLIENT)
+    private readonly cognitoClient: CognitoClient,
   ) {}
 
   async execute(input: CreateUserDto): Promise<Either<Error, OutputUserDto>> {
-    const cognito = new CognitoIdentityProviderClient({
-      region: 'us-east-1',
-    });
-    try {
-      await cognito.send(
-        new AdminCreateUserCommand({
-          UserPoolId: process.env.COGNITO_USER_POOL_ID,
-          Username: input.email,
-          UserAttributes: [{ Name: 'email', Value: input.email }],
-          MessageAction: 'SUPPRESS',
-        }),
-      );
-    } catch (err) {
-      return left(new Error(`Erro ao tentar cadastrar no Cognito: ${err}`));
+    const cognitoCommand = await this.cognitoClient.createUser(input);
+
+    if (cognitoCommand.isLeft()) {
+      return left(cognitoCommand.value);
     }
+
     const user = await this.userRepository.create(UserEntity.CreateNew(input));
     if (user.isLeft()) {
       return left(user.value);

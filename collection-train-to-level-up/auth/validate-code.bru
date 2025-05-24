@@ -1,0 +1,19 @@
+meta {
+  name: validate-code
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url_local}}/auth/validate-code
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "gabriel.mfrahm@gmail.com",
+    "code": "544286",
+    "session": "AYABeK7k9Z9Tm9hOJcz40TtEpQ8AHQABAAdTZXJ2aWNlABBDb2duaXRvVXNlclBvb2xzAAEAB2F3cy1rbXMAS2Fybjphd3M6a21zOnVzLWVhc3QtMTo3NDU2MjM0Njc1NTU6a2V5L2IxNTVhZmNhLWJmMjktNGVlZC1hZmQ4LWE5ZTA5MzY1M2RiZQC4AQIBAHhR9E4zNbI1ofi3Y01_Ljgh2wK-ZaC__bKufjbgmejy4gEhxKTjKrXaiIevSCu8F-obAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMUkVL69ptelOpIYpLAgEQgDsP4wVtyxpRYzeT_IfqSP61CS5nGto8kAMryRfcRVgZPABSbuCpfOdZmMyg7nWgofv3Y0RjrH0-FYKE3gIAAAAADAAAEAAAAAAAAAAAAAAAAACGsYBIPmz4KCX3f8wUKL9C_____wAAAAEAAAAAAAAAAAAAAAEAAAEoIMMZ6roiR9Pquo_3FCwm1kku799vFTsx3OLQIPtuydkWb_HPyw8BdAG1eZFA0ztXcGaPm1Hy2evPu-p77lVl-hhkgl5cqyAOnJM1p43jCEmh5U3v-BOEGfN3OJvUuH8FgiYQ7L7kY3ACY2cNSUu6igwKhlsbeqvT00PbAxrO3F5Mnylgq62-J3xD_zrUhx8curdxdyNFHKPfPCBnez5WhwXJQGGS3Z66-224RUgBP6uN08YQExdd9eHIrcOM5i5eZiNI1wLZOjE5u91JMnBeIkWwcv__GY17rniviasW8K7mmvKZCHQrx-doUPSNZuEqyLWtAipI8CnLwqudEeWMqWo6mL1CvzbvKJ6wZgz0R83tEjL4Y2hOSWMD9sulp7gdEhpsl9etgVX59HeTfPQyy63jb1UhZlSU"
+  }
+}

@@ -1,22 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, InjectionToken } from '@nestjs/common';
 import { UserRepositoryInterface } from '../interfaces/user.repository.interface';
 import { Either, left, right } from '@shared/either';
 import { UserEntity } from '../entities/user.entity';
-import { PrismaService } from '@modules/database/prisma/prisma.service';
+import {
+  PRISMA_SERVICE,
+  PrismaService,
+} from '@modules/database/prisma/prisma.service';
 
 import { BadRequestException } from '@shared/exceptions/bad-request.exception';
 import { NotFoundException } from '@shared/exceptions/not-found.exception';
 
+export const USER_REPOSITORY_USER_REPOSITORY: InjectionToken<UserRepositoryInterface> =
+  Symbol('UserRepository');
+
 @Injectable()
 export class UserRepository implements UserRepositoryInterface {
-  private readonly model: PrismaService['user'];
-  constructor(prismaService: PrismaService) {
-    this.model = prismaService.user;
-  }
+  constructor(
+    @Inject(PRISMA_SERVICE)
+    private readonly prismaService: PrismaService,
+  ) {}
 
   async create(user: UserEntity): Promise<Either<Error, UserEntity>> {
     try {
-      const checkEmail = await this.model.findUnique({
+      const checkEmail = await this.prismaService.user.findUnique({
         where: {
           email: user.getEmail(),
         },
@@ -30,7 +36,7 @@ export class UserRepository implements UserRepositoryInterface {
         );
       }
 
-      const createUser = await this.model.create({
+      const createUser = await this.prismaService.user.create({
         data: {
           id: user.getId(),
           email: user.getEmail(),
@@ -53,7 +59,7 @@ export class UserRepository implements UserRepositoryInterface {
 
   async findByEmail(email: string): Promise<Either<Error, UserEntity>> {
     try {
-      const user = await this.model.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: {
           email: email,
         },
@@ -75,7 +81,7 @@ export class UserRepository implements UserRepositoryInterface {
 
   async findById(id: string): Promise<Either<Error, UserEntity>> {
     try {
-      const user = await this.model.findUnique({
+      const user = await this.prismaService.user.findUnique({
         where: {
           id: id,
         },
@@ -97,7 +103,7 @@ export class UserRepository implements UserRepositoryInterface {
 
   async delete(id: string): Promise<Either<Error, void>> {
     try {
-      const checkUser = await this.model.findUnique({
+      const checkUser = await this.prismaService.user.findUnique({
         where: {
           id,
         },

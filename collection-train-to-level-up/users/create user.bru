@@ -5,14 +5,14 @@ meta {
 }
 
 post {
-  url: http://plain-to-level-up-nlb-a7df751547496576.elb.us-east-1.amazonaws.com:3333/api/users
+  url: {{base_url}}/users
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "email": "gabriel@teste.com",
+    "email": "gabriel.mfrahm@gmail.com",
     "name": "Gabriel Marques Frahm"
   }
 }
