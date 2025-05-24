@@ -43,7 +43,7 @@ export class CognitoClient {
     }
   }
 
-  async sendCode(email: string): Promise<Either<Error, boolean>> {
+  async sendCode(email: string): Promise<Either<Error, any>> {
     try {
       const command = new AdminInitiateAuthCommand({
         UserPoolId: process.env.COGNITO_USER_POOL_ID,
@@ -53,8 +53,8 @@ export class CognitoClient {
           USERNAME: email,
         },
       });
-      await this.cognito.send(command);
-      return right(true);
+      const sendCode = await this.cognito.send(command);
+      return right(sendCode);
     } catch (error) {
       console.error('Error sending code:', error);
       return left(error);
