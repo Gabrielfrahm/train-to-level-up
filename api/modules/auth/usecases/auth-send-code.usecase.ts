@@ -2,7 +2,7 @@ import { BaseUseCase } from '@shared/interfaces/usecase.interfaces';
 
 import { Either, left, right } from '@shared/either';
 import { Inject, Injectable, InjectionToken } from '@nestjs/common';
-import { type AuthSendCodeDto } from '../dtos/auth.dto';
+import { AuthSendCodeOutputDto, type AuthSendCodeDto } from '../dtos/auth.dto';
 import { COGNITO_CLIENT, CognitoClient } from '@shared/clients/cognito.client';
 
 export const AUTH_SEND_CODE_USE_CASE: InjectionToken<AuthSendCodeUseCase> =
@@ -10,14 +10,16 @@ export const AUTH_SEND_CODE_USE_CASE: InjectionToken<AuthSendCodeUseCase> =
 
 @Injectable()
 export class AuthSendCodeUseCase
-  implements BaseUseCase<AuthSendCodeDto, Either<Error, boolean>>
+  implements BaseUseCase<AuthSendCodeDto, Either<Error, AuthSendCodeOutputDto>>
 {
   constructor(
     @Inject(COGNITO_CLIENT)
     private readonly cognitoClient: CognitoClient,
   ) {}
 
-  async execute(input: AuthSendCodeDto): Promise<Either<Error, boolean>> {
+  async execute(
+    input: AuthSendCodeDto,
+  ): Promise<Either<Error, AuthSendCodeOutputDto>> {
     const cognito = await this.cognitoClient.sendCode(input.email);
     if (cognito.isLeft()) {
       return left(cognito.value);

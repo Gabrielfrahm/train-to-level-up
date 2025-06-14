@@ -6,6 +6,10 @@ import {
 } from '@aws-sdk/client-cognito-identity-provider';
 import { Injectable, InjectionToken } from '@nestjs/common';
 import { Either, left, right } from '@shared/either';
+import {
+  ISendCodeInput,
+  IValidateCodeOutput,
+} from './dtos/identity.client.dto';
 
 export const COGNITO_CLIENT: InjectionToken<CognitoClient> = Symbol(
   'IIdentityProviderClient',
@@ -16,12 +20,12 @@ export interface IIdentityProviderClient {
     name: string;
     email: string;
   }): Promise<Either<Error, boolean>>;
-  sendCode(email: string): Promise<Either<Error, any>>;
+  sendCode(email: string): Promise<Either<Error, ISendCodeInput>>;
   validateCode(input: {
     email: string;
     code: string;
     session: string;
-  }): Promise<Either<Error, any>>;
+  }): Promise<Either<Error, IValidateCodeOutput>>;
 }
 
 @Injectable()
@@ -57,7 +61,7 @@ export class CognitoClient implements IIdentityProviderClient {
     }
   }
 
-  async sendCode(email: string): Promise<Either<Error, any>> {
+  async sendCode(email: string): Promise<Either<Error, ISendCodeInput>> {
     try {
       const command = new AdminInitiateAuthCommand({
         UserPoolId: process.env.COGNITO_USER_POOL_ID,
@@ -68,7 +72,10 @@ export class CognitoClient implements IIdentityProviderClient {
         },
       });
       const sendCode = await this.cognito.send(command);
-      return right(sendCode);
+      return right({
+        email: email,
+        session: sendCode.Session,
+      });
     } catch (error) {
       console.error('Error sending code:', error);
       return left(error);
@@ -79,7 +86,7 @@ export class CognitoClient implements IIdentityProviderClient {
     email: string;
     code: string;
     session: string;
-  }): Promise<Either<Error, any>> {
+  }): Promise<Either<Error, IValidateCodeOutput>> {
     try {
       const command = new RespondToAuthChallengeCommand({
         ChallengeName: 'CUSTOM_CHALLENGE',
@@ -91,7 +98,13 @@ export class CognitoClient implements IIdentityProviderClient {
         },
       });
       const validate = await this.cognito.send(command);
-      return right(validate);
+      return right({
+        accessToken: validate.AuthenticationResult.AccessToken,
+        refreshToken: validate.AuthenticationResult.RefreshToken,
+        idToken: validate.AuthenticationResult.IdToken,
+        expiresIn: validate.AuthenticationResult.ExpiresIn.toString(),
+        typeToken: validate.AuthenticationResult.TokenType,
+      });
     } catch (error) {
       console.error('Error validate code:', error);
       return left(error);
