@@ -59,7 +59,7 @@ resource "aws_apigatewayv2_vpc_link" "vpc_link" {
 resource "aws_apigatewayv2_integration" "nlb_integration" {
   api_id             = aws_apigatewayv2_api.http_api.id
   integration_type   = "HTTP_PROXY"
-  integration_uri    = "http://${aws_lb.nlb.dns_name}"
+  integration_uri    = aws_lb_listener.nlb_listener.arn
   integration_method = "ANY"
   connection_type    = "VPC_LINK"
   connection_id      = aws_apigatewayv2_vpc_link.vpc_link.id
