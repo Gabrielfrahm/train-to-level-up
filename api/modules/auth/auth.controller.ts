@@ -1,5 +1,10 @@
 import { Body, Controller, Inject, Logger, Post } from '@nestjs/common';
-import { AuthSendCodeDto, AuthValidateCodeDto } from './dtos/auth.dto';
+import {
+  AuthSendCodeDto,
+  AuthSendCodeOutputDto,
+  AuthValidateCodeDto,
+  AuthValidateCodeOutputDto,
+} from './dtos/auth.dto';
 import {
   AUTH_SEND_CODE_USE_CASE,
   AuthSendCodeUseCase,
@@ -21,7 +26,9 @@ export class AuthController {
   ) {}
 
   @Post('/send-code')
-  async authUser(@Body() data: AuthSendCodeDto): Promise<boolean> {
+  async authUser(
+    @Body() data: AuthSendCodeDto,
+  ): Promise<AuthSendCodeOutputDto> {
     const response = await this.authSendCodeUseCase.execute(data);
     if (response.isLeft()) {
       this.loggerService.error(
@@ -37,7 +44,9 @@ export class AuthController {
   }
 
   @Post('/validate-code')
-  async authUserStep2(@Body() data: AuthValidateCodeDto): Promise<any> {
+  async authUserStep2(
+    @Body() data: AuthValidateCodeDto,
+  ): Promise<AuthValidateCodeOutputDto> {
     const response = await this.authValidateCodeUseCase.execute(data);
     if (response.isLeft()) {
       this.loggerService.error(
@@ -48,7 +57,7 @@ export class AuthController {
     }
 
     this.loggerService.log(
-      `success validate code ${JSON.stringify(response.value.email)}`,
+      `success validate code ${JSON.stringify(data.email)}`,
     );
 
     return response.value;
