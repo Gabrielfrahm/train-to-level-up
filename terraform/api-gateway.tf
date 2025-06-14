@@ -52,8 +52,8 @@ resource "aws_apigatewayv2_api" "http_api" {
 
 resource "aws_apigatewayv2_vpc_link" "vpc_link" {
   name               = "${var.prefix}-vpc-link"
-  security_group_ids = [aws_security_group.app.id]
-  subnet_ids         = aws_subnet.subnets[*].id
+  security_group_ids = [module.new-vpc.security_group_id]
+  subnet_ids         = module.new-vpc.private_subnet_ids
 }
 
 resource "aws_apigatewayv2_integration" "nlb_integration" {
