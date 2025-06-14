@@ -7,11 +7,25 @@ import {
 import { Injectable, InjectionToken } from '@nestjs/common';
 import { Either, left, right } from '@shared/either';
 
-export const COGNITO_CLIENT: InjectionToken<CognitoClient> =
-  Symbol('CognitoClient');
+export const COGNITO_CLIENT: InjectionToken<CognitoClient> = Symbol(
+  'IIdentityProviderClient',
+);
+
+export interface IIdentityProviderClient {
+  createUser(input: {
+    name: string;
+    email: string;
+  }): Promise<Either<Error, boolean>>;
+  sendCode(email: string): Promise<Either<Error, any>>;
+  validateCode(input: {
+    email: string;
+    code: string;
+    session: string;
+  }): Promise<Either<Error, any>>;
+}
 
 @Injectable()
-export class CognitoClient {
+export class CognitoClient implements IIdentityProviderClient {
   private readonly cognito: CognitoIdentityProviderClient;
 
   constructor() {

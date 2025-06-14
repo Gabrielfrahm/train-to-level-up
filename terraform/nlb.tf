@@ -41,7 +41,7 @@
 
 resource "aws_lb" "nlb" {
   name               = "${var.prefix}-nlb"
-  internal           = false
+  internal           = true
   load_balancer_type = "network"
   subnets            = module.new-vpc.subnet_ids
 }
